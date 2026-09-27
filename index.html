@@ -94,6 +94,7 @@
     padding:4px 10px; border-radius:99px;
   }
   .sync-pill.offline{ color:var(--warn); background:var(--warn-soft); }
+  .last-search{ font-size:12px; color:var(--ink-soft); margin:6px 0 0; }
 
   h2{
     font-family:"Sora", ui-sans-serif, system-ui, sans-serif;
@@ -307,6 +308,7 @@
       <input id="who-input" type="text" placeholder="ex: Thomas" maxlength="24">
       <span class="sync-pill" id="sync-pill">Connexion…</span>
     </div>
+    <p class="last-search" id="last-search">Dernière recherche : —</p>
   </div>
 
   <section>
@@ -893,6 +895,19 @@ if (db){
       catalogState = next;
       recomputeListings();
       renderListings();
+    }, () => {});
+
+    onSnapshot(doc(db, "meta", "status"), snap => {
+      const el = document.getElementById("last-search");
+      const data = snap.exists() ? snap.data() : null;
+      if (data && data.last_run_at){
+        const d = new Date(data.last_run_at);
+        const when = d.toLocaleString("fr-FR", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+        const count = typeof data.new_listings_count === "number" ? data.new_listings_count : null;
+        el.textContent = "Dernière recherche : " + when + (count !== null ? " · " + count + " nouvelle(s) annonce(s)" : "");
+      } else {
+        el.textContent = "Dernière recherche : pas encore effectuée";
+      }
     }, () => {});
   }catch(e){ initTrackingFallback(); }
 } else {
