@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radar Local Reims</title>
+<meta name="description" content="Repérage de locaux commerciaux à Reims pour le projet FAIPARLA — dossier partagé.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#F4F5F7;
+    --surface:#FFFFFF;
+    --surface-2:#ECEEF2;
+    --ink:#12151C;
+    --ink-soft:#5B6472;
+    --line:#E1E4EA;
+    --accent:#FF5A36;
+    --accent-strong:#E14A28;
+    --accent-soft:#FFE7DE;
+    --brand:#0E7C66;
+    --brand-strong:#0B6553;
+    --brand-soft:#DFF2ED;
+    --good:#1E8E5A;
+    --good-soft:#E3F5EC;
+    --warn:#B7791E;
+    --warn-soft:#FBF0DA;
+    --bad:#D64545;
+    --bad-soft:#FBE7E7;
+    --shadow: 0 1px 2px rgba(18,21,28,.05), 0 10px 26px -14px rgba(18,21,28,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0B0D11;
+      --surface:#161A21;
+      --surface-2:#1E232C;
+      --ink:#EEF1F5;
+      --ink-soft:#93A0AF;
+      --line:#2A303B;
+      --accent:#FF7A57;
+      --accent-strong:#FFA07E;
+      --accent-soft:#3A2019;
+      --brand:#2FBE9B;
+      --brand-strong:#57D6B4;
+      --brand-soft:#123027;
+      --good:#4ADE95;
+      --good-soft:#123422;
+      --warn:#F0B742;
+      --warn-soft:#382A10;
+      --bad:#FF6B6B;
+      --bad-soft:#3A1616;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+
+  *{box-sizing:border-box}
+  html,body{ margin:0; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Work Sans", ui-sans-serif, system-ui, sans-serif;
+    padding-inline:20px;
+    padding-block:26px 56px;
+    display:flex;
+    justify-content:center;
+  }
+  .page{ width:100%; max-width:640px; display:flex; flex-direction:column; gap:30px; }
+
+  .eyebrow{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:11.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--brand);
+  }
+  h1{
+    font-family:"Sora", ui-sans-serif, system-ui, sans-serif;
+    font-weight:800; font-size:clamp(28px,7vw,36px); line-height:1.06;
+    margin:6px 0 10px; text-wrap:balance; letter-spacing:-.02em;
+  }
+  .lede{ color:var(--ink-soft); font-size:14.5px; line-height:1.55; max-width:52ch; }
+  .lede b{ color:var(--ink); font-weight:600; }
+
+  .who-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:6px; }
+  .who-row label{ font-size:12.5px; color:var(--ink-soft); }
+  .who-row input{
+    font-family:"Work Sans", sans-serif; font-size:13px; color:var(--ink);
+    background:var(--surface); border:1px solid var(--line); border-radius:9px;
+    padding:6px 10px; width:140px;
+  }
+  .sync-pill{
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; font-weight:600;
+    color:var(--brand-strong); background:var(--brand-soft);
+    padding:4px 10px; border-radius:99px;
+  }
+  .sync-pill.offline{ color:var(--warn); background:var(--warn-soft); }
+
+  h2{
+    font-family:"Sora", ui-sans-serif, system-ui, sans-serif;
+    font-weight:700; font-size:19px; margin:0 0 4px; letter-spacing:-.01em;
+  }
+  .section-note{ color:var(--ink-soft); font-size:13px; line-height:1.5; margin:0 0 14px; }
+  .section-note b{ color: var(--ink); }
+
+  .spec{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .spec-row{
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+  }
+  .spec-row:last-child{ border-bottom:none; }
+  .spec-label{ font-size:13px; color:var(--ink-soft); }
+  .spec-value{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:13.5px; font-weight:600; text-align:right;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+  }
+  .flex-badge{
+    font-family:"Work Sans", sans-serif;
+    font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--accent-strong); background:var(--accent-soft);
+    padding:2px 7px; border-radius:99px;
+  }
+
+  .chips{ display:flex; gap:8px; margin-bottom:14px; }
+  .chip{
+    font-family:"Work Sans", sans-serif; font-size:13px; font-weight:600;
+    color:var(--ink-soft); background:var(--surface-2);
+    border:1px solid transparent; border-radius:99px;
+    padding:7px 14px; cursor:pointer;
+  }
+  .chip.active{ color:var(--brand-strong); background:var(--brand-soft); border-color:var(--brand); }
+
+  .cards{ display:flex; flex-direction:column; gap:12px; }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:16px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .card-name{ font-weight:600; font-size:15px; }
+  .card-desc{ color:var(--ink-soft); font-size:12.5px; line-height:1.5; margin:2px 0 0; }
+  .last-visit{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:10.5px; color:var(--ink-soft); white-space:nowrap;
+  }
+
+  .card-actions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .btn{
+    font-family:"Work Sans", sans-serif;
+    font-size:13px; font-weight:600;
+    color:#fff; background:var(--brand);
+    border:none; border-radius:10px;
+    padding:9px 14px;
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+    cursor:pointer;
+  }
+  .btn:focus-visible, .check:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, input:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+  .btn.secondary{ background:var(--surface-2); color:var(--ink); }
+
+  .check-row{
+    margin-left:auto;
+    display:flex; align-items:center; gap:6px;
+    font-size:12px; color:var(--ink-soft);
+  }
+  .check{ width:15px; height:15px; accent-color:var(--brand); cursor:pointer; }
+  label.check-label{ cursor:pointer; display:flex; align-items:center; gap:6px; }
+
+  .listing{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:4px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:16px 16px 16px 18px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .listing.v-ideal, .listing.v-concept_ready{ border-left-color:var(--good); }
+  .listing.v-a_verifier, .listing.v-stretch{ border-left-color:var(--warn); }
+  .listing.v-budget_depasse{ border-left-color:var(--bad); }
+
+  .listing-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .listing-title{ font-family:"Sora", sans-serif; font-weight:700; font-size:15px; line-height:1.3; }
+  .listing-source{ font-size:11.5px; color:var(--ink-soft); margin-top:3px; }
+  .badge{
+    font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding:3px 9px; border-radius:99px; white-space:nowrap; flex-shrink:0;
+  }
+  .badge-ideal, .badge-concept_ready{ color:var(--good); background:var(--good-soft); }
+  .badge-a_verifier, .badge-stretch{ color:var(--warn); background:var(--warn-soft); }
+  .badge-budget_depasse{ color:var(--bad); background:var(--bad-soft); }
+
+  .listing-meta{
+    display:flex; flex-wrap:wrap; gap:6px 14px;
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:12.5px; font-variant-numeric: tabular-nums;
+  }
+  .listing-meta span b{ font-weight:600; }
+  .listing-address{ font-size:12.5px; color:var(--ink-soft); }
+  .listing-note{
+    font-size:12.5px; line-height:1.55; color:var(--ink);
+    background:var(--surface-2); border-radius:10px; padding:10px 12px;
+  }
+  .listing-note .tag{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:10px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--brand-strong); display:block; margin-bottom:4px;
+  }
+
+  .icon-btn{
+    width:34px; height:34px; border-radius:10px;
+    border:1px solid var(--line); background:var(--surface);
+    display:inline-flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--ink-soft); flex-shrink:0;
+  }
+  .icon-btn svg{ width:16px; height:16px; }
+  .icon-btn.saved{ color:var(--accent); border-color:var(--accent); background:var(--accent-soft); }
+  .icon-btn.danger:hover{ color:var(--bad); border-color:var(--bad); }
+
+  .listing-track{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;
+    padding-top:8px; border-top:1px dashed var(--line);
+  }
+  .field{ display:flex; flex-direction:column; gap:4px; flex:1 1 140px; min-width:140px; }
+  .field label{ font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; }
+  select, textarea{
+    font-family:"Work Sans", sans-serif; font-size:13px; color:var(--ink);
+    background:var(--surface); border:1px solid var(--line); border-radius:9px;
+    padding:7px 9px;
+  }
+  textarea{ width:100%; min-height:40px; resize:vertical; }
+  .note-author{ font-size:10.5px; color:var(--ink-soft); font-style:italic; }
+
+  .hidden-note{ font-size:12px; color:var(--ink-soft); text-align:center; padding:4px 0; }
+  .hidden-note button{
+    font: inherit; color:var(--brand-strong); background:none; border:none;
+    text-decoration:underline; cursor:pointer; padding:0;
+  }
+
+  .contact{
+    background:var(--brand-soft);
+    border:1px solid var(--brand);
+    border-radius:16px;
+    padding:16px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .contact h3{ margin:0; font-family:"Sora", sans-serif; font-size:16px; font-weight:700; }
+  .contact p{ margin:0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
+  .contact-links{ display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+  .contact-links a{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:12.5px; font-weight:600;
+    color:var(--brand-strong);
+    text-decoration:none;
+    border-bottom:1px solid var(--brand);
+    padding-bottom:1px;
+  }
+
+  footer{
+    color:var(--ink-soft); font-size:11.5px; line-height:1.6;
+    border-top:1px solid var(--line); padding-top:16px;
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    .card, .listing, .btn, .icon-btn, .chip{ transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease, border-color .12s ease; }
+    .btn:active, .icon-btn:active{ transform: scale(.96); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div>
+    <div class="eyebrow">Dossier de recherche partagé</div>
+    <h1>Radar Local Reims</h1>
+    <p class="lede">Repérage de locaux commerciaux pour le projet <b>FAIPARLA</b> (sandwicherie, sans extraction) en hypercentre de Reims.</p>
+    <div class="who-row">
+      <label for="who-input">Ton prénom :</label>
+      <input id="who-input" type="text" placeholder="ex: Thomas" maxlength="24">
+      <span class="sync-pill" id="sync-pill">Connexion…</span>
+    </div>
+  </div>
+
+  <section>
+    <h2>Fiche critères</h2>
+    <p class="section-note">La grille utilisée pour juger chaque annonce ci-dessous.</p>
+    <div class="spec">
+      <div class="spec-row"><span class="spec-label">Secteur</span><span class="spec-value">Hypercentre &middot; Place du Forum</span></div>
+      <div class="spec-row"><span class="spec-label">Surface</span><span class="spec-value">50&ndash;120 m&sup2;</span></div>
+      <div class="spec-row"><span class="spec-label">Cuisine</span><span class="spec-value">Sans extraction</span></div>
+      <div class="spec-row"><span class="spec-label">Emplacement</span><span class="spec-value">Fort flux piéton &middot; beau linéaire vitrine</span></div>
+      <div class="spec-row"><span class="spec-label">Terrasse</span><span class="spec-value">Recommandée <span class="flex-badge">bonus</span></span></div>
+      <div class="spec-row"><span class="spec-label">Loyer</span><span class="spec-value">3 000 &euro;/mois max <span class="flex-badge">extensible</span></span></div>
+      <div class="spec-row"><span class="spec-label">Prix / droit au bail</span><span class="spec-value">65 000 &euro; max</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Annonces repérées</h2>
+    <p class="section-note">Snapshot du <b id="snapshot-date">27 septembre 2026</b>. Statut, favoris et notes sont partagés entre vous deux en temps réel. Les annonces mentionnant "restauration interdite" sont écartées automatiquement.</p>
+    <div class="chips">
+      <button class="chip active" data-filter="all" type="button">Tout</button>
+      <button class="chip" data-filter="saved" type="button">★ Favoris</button>
+    </div>
+    <div class="cards" id="listings"></div>
+    <div class="hidden-note" id="hidden-note" hidden></div>
+  </section>
+
+  <section>
+    <h2>Sources à surveiller</h2>
+    <p class="section-note">Pour vérifier vous-mêmes entre deux actualisations. Ouvrez, affinez surface/loyer, puis <b>créez une alerte email</b> sur le site &mdash; cochez une fois posée (case mémorisée sur cet appareil uniquement).</p>
+    <div class="cards" id="sources"></div>
+  </section>
+
+  <div class="contact">
+    <h3>Pour une offre exceptionnelle ou hors marché</h3>
+    <p>Arthur Loyd Reims &mdash; agence spécialisée immobilier d'entreprise, présence physique en centre-ville. Un appel direct remonte parfois des locaux jamais publiés en ligne, utile si vous êtes prêts à monter au-delà de 3 000&euro;.</p>
+    <div class="contact-links">
+      <a href="tel:+33326770505">03 26 77 05 05</a>
+      <a href="mailto:reims@arthur-loyd.com">reims@arthur-loyd.com</a>
+    </div>
+  </div>
+
+  <footer id="footer-note">
+    Site privé — demandez à Claude une actualisation des annonces quand vous en voulez de nouvelles.
+  </footer>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+/* ======================================================================
+   CONFIGURATION FIREBASE — à remplacer par la config de TON projet.
+   1. Va sur https://console.firebase.google.com, crée un projet gratuit.
+   2. Ajoute une "Web App" (icône </>) dans les paramètres du projet.
+   3. Copie-colle l'objet firebaseConfig qu'on te donne ici.
+   4. Active Firestore Database (mode production), puis dans l'onglet
+      Règles, colle :
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+            match /listings/{docId} { allow read, write: if true; }
+          }
+        }
+   ====================================================================== */
+const firebaseConfig = {
+  apiKey: "REMPLACE_MOI",
+  authDomain: "REMPLACE_MOI.firebaseapp.com",
+  projectId: "REMPLACE_MOI",
+  storageBucket: "REMPLACE_MOI.appspot.com",
+  messagingSenderId: "REMPLACE_MOI",
+  appId: "REMPLACE_MOI"
+};
+
+let db = null;
+try{
+  const app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+}catch(e){ /* config pas encore renseignée */ }
+
+const ICON_STAR = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 17.6 5.8 20.9l1.6-6.8-5.2-4.6 6.9-.7z"></path></svg>';
+const ICON_STAR_OUTLINE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 17.6 5.8 20.9l1.6-6.8-5.2-4.6 6.9-.7z"></path></svg>';
+const ICON_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>';
+
+const VERDICT_LABEL = {
+  ideal: "Idéal",
+  concept_ready: "Prêt à exploiter",
+  a_verifier: "À vérifier",
+  stretch: "Stretch budget",
+  budget_depasse: "Hors budget"
+};
+const VERDICT_RANK = { ideal:0, concept_ready:1, a_verifier:2, stretch:3, budget_depasse:4 };
+const BANNED_PHRASE = /restauration\s+interdite/i;
+
+const LISTINGS_RAW = [
+  { id:"erlon-31438", title:"Local commercial — secteur Place d'Erlon", source:"Erlon Immo Pro",
+    url:"https://www.erlon-immopro.com/offres-details/31438/", address:"Secteur Place d'Erlon, hypercentre, Reims",
+    surface:55, rent:1250, verdict:"ideal",
+    note:"Hypercentre, budget très confortable sous le plafond de 3 000€. Bon point de comparaison pour les autres offres de surface équivalente." },
+  { id:"erlon-33707", title:"Local commercial — Place d'Erlon", source:"Erlon Immo Pro",
+    url:"https://www.erlon-immopro.com/offres-details/33707/", address:"Place d'Erlon, Reims",
+    surface:80, rent:664, verdict:"a_verifier",
+    note:"Place d'Erlon = un des meilleurs flux piétons de Reims, mais loyer anormalement bas pour l'emplacement : probablement un lot en étage ou en second jour, pas une vitrine rez-de-chaussée. À faire confirmer par l'agence avant de se déplacer." },
+  { id:"erlon-33045", title:"Local commercial — Hyper Centre", source:"Erlon Immo Pro",
+    url:"https://www.erlon-immopro.com/offres-details/33045/", address:"Hyper Centre, Reims",
+    surface:96, rent:3000, verdict:"ideal",
+    note:"Pile dans les critères : hyper centre, haut de la fourchette de surface, loyer au plafond du budget. Candidat sérieux si l'adresse précise confirme un bon flux piéton." },
+  { id:"erlon-1089", title:"Local commercial — Rue de Vesle", source:"Erlon Immo Pro",
+    url:"https://www.erlon-immopro.com/offres-details/1089/", address:"Rue de Vesle, Reims",
+    surface:100, rent:3000, verdict:"ideal",
+    note:"Rue de Vesle est un des axes commerçants majeurs du centre de Reims, flux piéton naturellement fort. Loyer au plafond du budget mais surface généreuse." },
+  { id:"erlon-1091", title:"Local commercial — centre-ville, proche Rue de Vesle", source:"Erlon Immo Pro",
+    url:"https://www.erlon-immopro.com/offres-details/1091/", address:"Proche Rue de Vesle, centre-ville, Reims",
+    surface:70, rent:1450, verdict:"ideal",
+    note:"Bon compromis surface/loyer en plein centre-ville, à deux pas de Vesle. Un des dossiers les plus équilibrés de la sélection." },
+  { id:"erlon-33623", title:"Local commercial — centre-ville", source:"Erlon Immo Pro",
+    url:"https://www.erlon-immopro.com/offres-details/33623/", address:"Centre-ville, Reims",
+    surface:69, rent:1200, verdict:"ideal",
+    note:"Surface et loyer dans le cœur de cible, centre-ville confirmé. Il manque le nom de rue exact — à demander à l'agence." },
+  { id:"bl-41320709", title:"Ancien local de restauration rapide — proche gare", source:"BureauxLocaux.com",
+    url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-louer--41320709", address:"Proche gare, Reims",
+    surface:122, rent:2500, verdict:"concept_ready",
+    note:"Anciennement exploité en restauration rapide : cuisine déjà en place, donc pas de travaux d'installation. Légèrement hors hypercentre (secteur gare) et 2m² au-dessus de la fourchette cible, mais le gain de temps peut compenser." },
+  { id:"erlon-29277", title:"Local commercial R+1 — Rue Talleyrand", source:"Erlon Immo Pro",
+    url:"https://www.erlon-immopro.com/offres-details/29277/", address:"Rue Talleyrand, hyper centre, Reims",
+    surface:150, rent:1950, verdict:"stretch",
+    note:"Hyper centre et loyer très attractif au m², mais 150m² dépasse la fourchette de 120m² visée — à voir si une partie est en réserve/étage non exploitée en salle." },
+  { id:"bl-40156573", title:"Cession de bail — angle Drouet d'Erlon / Rue de Vesle", source:"BureauxLocaux.com",
+    url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-ceder--40156573", address:"Angle Place Drouet d'Erlon / Rue de Vesle, Reims",
+    surface:70, rent:1313, cession:166880, verdict:"budget_depasse",
+    note:"Emplacement numéro 1 à Reims, mais droit au bail de 166 880€ : plus de 2,5x le budget de 65 000€ fixé. À garder de côté seulement en cas de négociation ou de financement revu à la hausse." },
+  { id:"bl-40309419", title:"Local commercial — secteur Cathédrale", source:"BureauxLocaux.com",
+    url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-louer--40309419", address:"Secteur Cathédrale, Reims",
+    surface:107, rent:5000, verdict:"stretch",
+    note:"Emplacement touristique fort, mais loyer à 5 000€/mois très au-dessus des 3 000€ visés — à réserver au cas où une offre « exceptionnelle » de financement le justifie." },
+  { id:"erlon-33559", title:"Local commercial — Boulingrin", source:"Erlon Immo Pro",
+    url:"https://www.erlon-immopro.com/offres-details/33559/", address:"Secteur Boulingrin, Reims",
+    surface:60, rent:1500, verdict:"ideal",
+    note:"Boulingrin est à la lisière de l'hypercentre, proche des halles, fort passage les jours de marché. Bon candidat secondaire si les options plein centre ne se concrétisent pas." },
+  { id:"bl-42055248", title:"Local commercial — centre-ville", source:"BureauxLocaux.com",
+    url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-louer--42055248", address:"Centre-ville, Reims",
+    surface:96, rent:1800, verdict:"ideal",
+    note:"Vitrine, bureau et réserve, bon état général. Disponible février 2026 — à anticiper si le calendrier colle avec le projet." },
+  { id:"bl-41769770", title:"Local commercial — boutique + réserve à l'étage", source:"BureauxLocaux.com",
+    url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-louer--41769770", address:"Reims (secteur précis non communiqué)",
+    surface:85, rent:1500, verdict:"a_verifier",
+    note:"Boutique d'environ 60m² en rez-de-chaussée avec vitrine de 6m linéaires, réserve à l'étage. L'annonce ne précise pas le quartier exact — à confirmer avant de se déplacer." },
+  { id:"al-1295", title:"Local idéal restauration rapide — hyper-centre (réf. 1295)", source:"Arthur Loyd",
+    url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Hyper-centre, Reims — réf. 1295 à demander à l'agence",
+    surface:141, rent:null, verdict:"concept_ready",
+    note:"Présenté explicitement comme local idéal pour une activité de restauration rapide, en hyper-centre : correspond exactement au concept FAIPARLA. Dépasse la fourchette de surface (141 vs 120) et proposé en cession — loyer/prix à demander par téléphone." },
+  { id:"al-1515", title:"Local équipé restauration, terrasse et cave (réf. 1515)", source:"Arthur Loyd",
+    url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Reims — réf. 1515 à demander à l'agence",
+    surface:150, rent:null, verdict:"concept_ready",
+    note:"Déjà équipé pour la restauration, avec terrasse (le bonus recherché) et cave. Surface au-dessus de la cible (150m²) mais concept clé en main — mérite un appel pour le prix." },
+  { id:"al-1191", title:"Local en angle de rue, hyper-centre (réf. 1191)", source:"Arthur Loyd",
+    url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Hyper-centre, angle de rue, Reims — réf. 1191",
+    surface:106, rent:null, verdict:"a_verifier",
+    note:"Angle de rue en hyper-centre, dont 95m² de surface de vente, disponible de suite — bon signal de flux piéton double-face. Loyer non communiqué en ligne, à demander." },
+  { id:"al-1275", title:"Local commercial — hyper-centre (réf. 1275)", source:"Arthur Loyd",
+    url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Hyper-centre, Reims — réf. 1275",
+    surface:100, rent:null, verdict:"a_verifier",
+    note:"Taille pile dans la cible, hyper-centre confirmé par l'agence. Loyer sur demande — à obtenir avant de se déplacer." },
+  { id:"al-1415", title:"Local commercial — Reims Centre (réf. 1415)", source:"Arthur Loyd",
+    url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Reims Centre — réf. 1415",
+    surface:85, rent:null, verdict:"a_verifier",
+    note:"Bonne taille, secteur centre confirmé mais moins précis que hyper-centre. Loyer à demander." },
+  { id:"al-936", title:"Local centre-ville + extérieur 54m² (réf. 936)", source:"Arthur Loyd",
+    url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Centre-ville, Reims — réf. 936",
+    surface:72, rent:null, verdict:"a_verifier",
+    note:"Espace extérieur de 54m² : correspond bien au bonus terrasse recherché. Présenté comme cession malgré la section location — à clarifier avec l'agence, tout comme le loyer." },
+  { id:"al-1444", title:"Local commercial centre-ville, à céder (réf. 1444)", source:"Arthur Loyd",
+    url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Centre-ville, Reims — réf. 1444",
+    surface:70, rent:null, verdict:"a_verifier",
+    note:"Bonne taille et centre-ville confirmé, mais présenté en cession (reprise de bail probable) plutôt qu'en location classique — à clarifier avec l'agence, ainsi que le prix." }
+];
+
+const LISTINGS = LISTINGS_RAW.filter(item =>
+  !BANNED_PHRASE.test(item.title + " " + item.note + " " + (item.address || ""))
+);
+
+const STATUS_OPTIONS = [
+  ["a_voir", "À voir"], ["contacte", "Contacté"], ["visite_prevue", "Visite prévue"],
+  ["visite", "Visité"], ["interessant", "Intéressant"], ["ecarte", "Écarté"]
+];
+
+const SOURCES = [
+  { id:"leboncoin", name:"LeBonCoin", desc:"Catégorie Bureaux & Commerces filtrée sur Reims (51100) — location et cession.",
+    links:[{ label:"Ouvrir la recherche", url:"https://www.leboncoin.fr/cl/bureaux_commerces/cp_reims_51100" }] },
+  { id:"seloger", name:"SeLoger", desc:"Locaux commerciaux à louer, dont une recherche déjà resserrée sur le quartier Centre-Ville.",
+    links:[
+      { label:"Centre-Ville", url:"https://www.seloger.com/recherche/location/fonds-de-commerce/local-commercial/reims-51100/centre-ville-51100/nbh2fr9380" },
+      { label:"Tout Reims", url:"https://www.seloger.com/immobilier/locations/immo-reims-51/bien-local-commercial/" }
+    ] },
+  { id:"logicimmo", name:"Logic-Immo", desc:"Location de locaux commerciaux à Reims, portail complémentaire de SeLoger.",
+    links:[{ label:"Ouvrir la recherche", url:"https://www.logic-immo.com/recherche-immo/location/commerce/local-commercial/grand-est/reims-51100/ad08fr19969" }] },
+  { id:"bureauxlocaux", name:"BureauxLocaux.com", desc:"Le plus exhaustif côté immobilier d'entreprise pro.",
+    links:[{ label:"Ouvrir la recherche", url:"https://www.bureauxlocaux.com/immobilier-d-entreprise/annonces/reims-51100/location-commerces" }] },
+  { id:"geolocaux", name:"Geolocaux", desc:"Autre agrégateur pro, parfois en avance sur une annonce.",
+    links:[{ label:"Ouvrir la recherche", url:"https://www.geolocaux.com/location/local-commercial/reims-51100/" }] },
+  { id:"arthurloyd", name:"Arthur Loyd", desc:"Réseau national d'immobilier d'entreprise, agence physique à Reims.",
+    links:[
+      { label:"Location", url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims" },
+      { label:"Vente / cession", url:"https://www.arthur-loyd.com/locaux-commerciaux-vente/grand-est/reims" }
+    ] },
+  { id:"erlon", name:"Erlon Immo Pro", desc:"Agence 100% rémoise spécialisée en immobilier professionnel.",
+    links:[{ label:"Ouvrir la recherche", url:"https://www.erlon-immopro.com/location-commerce/" }] }
+];
+
+function loadLocal(key){ try{ return JSON.parse(localStorage.getItem(key) || "{}"); }catch(e){ return {}; } }
+function saveLocal(key, obj){ try{ localStorage.setItem(key, JSON.stringify(obj)); }catch(e){} }
+function fmtEuro(n){ return n.toLocaleString("fr-FR") + " €"; }
+function fmtDate(iso){
+  if(!iso) return "";
+  try{ const d = new Date(iso); return "vu " + d.toLocaleDateString("fr-FR", { day:"2-digit", month:"2-digit" }); }
+  catch(e){ return ""; }
+}
+
+/* ---------- who am I (simple 2-person attribution, no auth) ---------- */
+const whoInput = document.getElementById("who-input");
+whoInput.value = localStorage.getItem("radar-who") || "";
+whoInput.addEventListener("blur", () => {
+  try{ localStorage.setItem("radar-who", whoInput.value.trim()); }catch(e){}
+});
+function whoAmI(){ return (localStorage.getItem("radar-who") || "").trim(); }
+
+/* ---------- sources section: per-device checklist ---------- */
+function renderSources(){
+  const state = loadLocal("radar-local-reims-sources");
+  const container = document.getElementById("sources");
+  container.innerHTML = "";
+  SOURCES.forEach(src => {
+    const s = state[src.id] || {};
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const top = document.createElement("div");
+    top.className = "card-top";
+    const nameWrap = document.createElement("div");
+    const name = document.createElement("div");
+    name.className = "card-name";
+    name.textContent = src.name;
+    const desc = document.createElement("p");
+    desc.className = "card-desc";
+    desc.textContent = src.desc;
+    nameWrap.append(name, desc);
+    top.appendChild(nameWrap);
+    if (s.visited){
+      const lv = document.createElement("span");
+      lv.className = "last-visit";
+      lv.textContent = fmtDate(s.visited);
+      top.appendChild(lv);
+    }
+    card.appendChild(top);
+
+    const actions = document.createElement("div");
+    actions.className = "card-actions";
+    src.links.forEach((link, i) => {
+      const a = document.createElement("a");
+      a.className = "btn" + (i > 0 ? " secondary" : "");
+      a.href = link.url; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = link.label;
+      a.addEventListener("click", () => {
+        const st = loadLocal("radar-local-reims-sources");
+        st[src.id] = st[src.id] || {};
+        st[src.id].visited = new Date().toISOString();
+        saveLocal("radar-local-reims-sources", st);
+      });
+      actions.appendChild(a);
+    });
+
+    const checkRow = document.createElement("label");
+    checkRow.className = "check-row check-label";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox"; checkbox.className = "check"; checkbox.id = "alert-" + src.id;
+    checkbox.checked = !!s.alertSet;
+    checkbox.addEventListener("change", () => {
+      const st = loadLocal("radar-local-reims-sources");
+      st[src.id] = st[src.id] || {};
+      st[src.id].alertSet = checkbox.checked;
+      saveLocal("radar-local-reims-sources", st);
+    });
+    const checkText = document.createElement("span");
+    checkText.textContent = "Alerte créée";
+    checkRow.append(checkbox, checkText);
+    actions.appendChild(checkRow);
+
+    card.appendChild(actions);
+    container.appendChild(card);
+  });
+}
+
+/* ---------- listings: shared tracking via Firestore ---------- */
+let trackState = {};
+let filterMode = "all";
+
+function getTrack(id){
+  const t = trackState[id] || {};
+  return { status:t.status || "a_voir", user_notes:t.user_notes || "", saved:!!t.saved, hidden:!!t.hidden, updated_by:t.updated_by || "" };
+}
+
+function writeTrack(id, patch){
+  const next = Object.assign({}, getTrack(id), patch, { updated_by: whoAmI() || getTrack(id).updated_by, updated_at: new Date().toISOString() });
+  trackState[id] = next;
+  if (db){
+    setDoc(doc(db, "listings", id), next).catch(() => {});
+  } else {
+    const st = loadLocal("radar-local-reims-track");
+    st[id] = next;
+    saveLocal("radar-local-reims-track", st);
+  }
+}
+
+function renderListings(){
+  const container = document.getElementById("listings");
+  const hiddenNote = document.getElementById("hidden-note");
+  container.innerHTML = "";
+
+  let visible = LISTINGS.filter(item => !getTrack(item.id).hidden);
+  const hiddenCount = LISTINGS.length - visible.length;
+  if (hiddenCount > 0){
+    hiddenNote.hidden = false;
+    hiddenNote.innerHTML = "";
+    hiddenNote.appendChild(document.createTextNode(hiddenCount + " annonce(s) masquée(s) — "));
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.textContent = "tout réafficher";
+    btn.addEventListener("click", () => {
+      LISTINGS.forEach(item => { if (getTrack(item.id).hidden) writeTrack(item.id, { hidden:false }); });
+      renderListings();
+    });
+    hiddenNote.appendChild(btn);
+  } else {
+    hiddenNote.hidden = true;
+  }
+
+  if (filterMode === "saved") visible = visible.filter(item => getTrack(item.id).saved);
+
+  const rentSortValue = item => (typeof item.rent === "number") ? item.rent : 999999;
+  const sorted = visible.slice().sort((a, b) => {
+    const ta = getTrack(a.id), tb = getTrack(b.id);
+    if (ta.saved !== tb.saved) return ta.saved ? -1 : 1;
+    const ra = VERDICT_RANK[a.verdict], rb = VERDICT_RANK[b.verdict];
+    if (ra !== rb) return ra - rb;
+    return rentSortValue(a) - rentSortValue(b);
+  });
+
+  if (sorted.length === 0){
+    const empty = document.createElement("p");
+    empty.className = "section-note";
+    empty.textContent = filterMode === "saved" ? "Aucun favori pour le moment — cliquez sur l'étoile d'une annonce pour la garder ici." : "Aucune annonce à afficher.";
+    container.appendChild(empty);
+    return;
+  }
+
+  sorted.forEach(item => {
+    const track = getTrack(item.id);
+    const card = document.createElement("div");
+    card.className = "listing v-" + item.verdict;
+
+    const top = document.createElement("div");
+    top.className = "listing-top";
+    const titleWrap = document.createElement("div");
+    const title = document.createElement("div");
+    title.className = "listing-title"; title.textContent = item.title;
+    const source = document.createElement("div");
+    source.className = "listing-source"; source.textContent = item.source;
+    titleWrap.append(title, source);
+    top.appendChild(titleWrap);
+    const badge = document.createElement("span");
+    badge.className = "badge badge-" + item.verdict;
+    badge.textContent = VERDICT_LABEL[item.verdict];
+    top.appendChild(badge);
+    card.appendChild(top);
+
+    const meta = document.createElement("div");
+    meta.className = "listing-meta";
+    const surfaceSpan = document.createElement("span");
+    surfaceSpan.innerHTML = "<b>" + item.surface + " m²</b>";
+    meta.appendChild(surfaceSpan);
+    const rentSpan = document.createElement("span");
+    rentSpan.innerHTML = (typeof item.rent === "number") ? ("<b>" + fmtEuro(item.rent) + "</b>/mois") : "<b>Sur demande</b>";
+    meta.appendChild(rentSpan);
+    if (item.cession){
+      const cessionSpan = document.createElement("span");
+      cessionSpan.innerHTML = "droit au bail <b>" + fmtEuro(item.cession) + "</b>";
+      meta.appendChild(cessionSpan);
+    }
+    card.appendChild(meta);
+
+    const address = document.createElement("div");
+    address.className = "listing-address"; address.textContent = item.address;
+    card.appendChild(address);
+
+    const note = document.createElement("div");
+    note.className = "listing-note";
+    const tag = document.createElement("span");
+    tag.className = "tag"; tag.textContent = "Analyse";
+    note.appendChild(tag);
+    note.appendChild(document.createTextNode(item.note));
+    card.appendChild(note);
+
+    const actions = document.createElement("div");
+    actions.className = "card-actions";
+    const linkBtn = document.createElement("a");
+    linkBtn.className = "btn"; linkBtn.href = item.url; linkBtn.target = "_blank"; linkBtn.rel = "noopener";
+    linkBtn.textContent = "Voir l'annonce";
+    actions.appendChild(linkBtn);
+
+    const spacer = document.createElement("div");
+    spacer.style.marginLeft = "auto"; spacer.style.display = "flex"; spacer.style.gap = "8px";
+
+    const saveBtn = document.createElement("button");
+    saveBtn.type = "button";
+    saveBtn.className = "icon-btn" + (track.saved ? " saved" : "");
+    saveBtn.title = track.saved ? "Retirer des favoris" : "Sauvegarder";
+    saveBtn.setAttribute("aria-label", saveBtn.title);
+    saveBtn.innerHTML = track.saved ? ICON_STAR : ICON_STAR_OUTLINE;
+    saveBtn.addEventListener("click", () => { writeTrack(item.id, { saved: !track.saved }); renderListings(); });
+    spacer.appendChild(saveBtn);
+
+    const delBtn = document.createElement("button");
+    delBtn.type = "button"; delBtn.className = "icon-btn danger";
+    delBtn.title = "Supprimer"; delBtn.setAttribute("aria-label", "Supprimer");
+    delBtn.innerHTML = ICON_TRASH;
+    delBtn.addEventListener("click", () => {
+      if (window.confirm("Supprimer cette annonce de la liste ?")){ writeTrack(item.id, { hidden:true }); renderListings(); }
+    });
+    spacer.appendChild(delBtn);
+
+    actions.appendChild(spacer);
+    card.appendChild(actions);
+
+    const trackRow = document.createElement("div");
+    trackRow.className = "listing-track";
+
+    const statusField = document.createElement("div");
+    statusField.className = "field";
+    const statusLabel = document.createElement("label");
+    statusLabel.setAttribute("for", "status-" + item.id); statusLabel.textContent = "Statut";
+    const statusSelect = document.createElement("select");
+    statusSelect.id = "status-" + item.id;
+    STATUS_OPTIONS.forEach(([val, label]) => {
+      const o = document.createElement("option");
+      o.value = val; o.textContent = label;
+      if (val === track.status) o.selected = true;
+      statusSelect.appendChild(o);
+    });
+    statusSelect.addEventListener("change", () => writeTrack(item.id, { status: statusSelect.value }));
+    statusField.append(statusLabel, statusSelect);
+    trackRow.appendChild(statusField);
+
+    const notesField = document.createElement("div");
+    notesField.className = "field"; notesField.style.flexBasis = "220px";
+    const notesLabel = document.createElement("label");
+    notesLabel.setAttribute("for", "notes-" + item.id); notesLabel.textContent = "Note (partagée)";
+    const notesArea = document.createElement("textarea");
+    notesArea.id = "notes-" + item.id;
+    notesArea.placeholder = "Ex: appelé le 03/10, visite jeudi...";
+    notesArea.value = track.user_notes || "";
+    notesArea.addEventListener("blur", () => writeTrack(item.id, { user_notes: notesArea.value }));
+    notesField.appendChild(notesLabel);
+    notesField.appendChild(notesArea);
+    if (track.updated_by){
+      const author = document.createElement("span");
+      author.className = "note-author";
+      author.textContent = "dernière modif : " + track.updated_by;
+      notesField.appendChild(author);
+    }
+    trackRow.appendChild(notesField);
+
+    card.appendChild(trackRow);
+    container.appendChild(card);
+  });
+}
+
+document.querySelectorAll(".chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    filterMode = chip.getAttribute("data-filter");
+    renderListings();
+  });
+});
+
+function setSyncPill(mode){
+  const pill = document.getElementById("sync-pill");
+  if (mode === "online"){ pill.textContent = "Synchro en direct"; pill.classList.remove("offline"); }
+  else { pill.textContent = "Hors ligne (sur cet appareil)"; pill.classList.add("offline"); }
+}
+
+function initTrackingFallback(){
+  trackState = loadLocal("radar-local-reims-track");
+  setSyncPill("offline");
+  document.getElementById("footer-note").textContent = "Config Firebase manquante ou hors ligne : statut/favoris/notes sont mémorisés sur cet appareil uniquement, pas partagés avec ton associée. Complète firebaseConfig dans index.html pour activer le partage.";
+  renderListings();
+}
+
+if (db){
+  try{
+    onSnapshot(collection(db, "listings"), snap => {
+      const next = {};
+      snap.forEach(d => { next[d.id] = d.data() || {}; });
+      trackState = next;
+      setSyncPill("online");
+      renderListings();
+    }, () => initTrackingFallback());
+  }catch(e){ initTrackingFallback(); }
+} else {
+  initTrackingFallback();
+}
+
+renderSources();
+renderListings();
+</script>
+</body>
+</html>
