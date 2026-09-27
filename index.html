@@ -209,6 +209,8 @@
     font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
     padding:3px 9px; border-radius:99px; white-space:nowrap; flex-shrink:0;
   }
+  .badge-new{ color:#fff; background:var(--accent); display:inline-flex; align-items:center; gap:3px; }
+  .badge-new svg{ width:10px; height:10px; }
   .badge-ideal, .badge-concept_ready{ color:var(--good); background:var(--good-soft); }
   .badge-a_verifier, .badge-stretch{ color:var(--warn); background:var(--warn-soft); }
   .badge-budget_depasse{ color:var(--bad); background:var(--bad-soft); }
@@ -529,6 +531,29 @@ function recomputeListings(){
 }
 recomputeListings();
 
+/* "Nouveau" = ajouté par l'agent automatique (présent dans catalogState) et
+   pas encore vu sur cet appareil. On fige la liste des "vus" au chargement, on
+   l'affiche le temps de la visite, puis on marque tout comme vu pour la prochaine fois. */
+function loadSeenSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem("radar-seen-catalog") || "[]")); }
+  catch(e){ return new Set(); }
+}
+function saveSeenSet(set){
+  try{ localStorage.setItem("radar-seen-catalog", JSON.stringify(Array.from(set))); }catch(e){}
+}
+let seenCatalogIds = loadSeenSet();
+let markSeenTimer = null;
+function scheduleMarkSeen(){
+  clearTimeout(markSeenTimer);
+  markSeenTimer = setTimeout(() => {
+    Object.keys(catalogState).forEach(id => seenCatalogIds.add(id));
+    saveSeenSet(seenCatalogIds);
+  }, 4000);
+}
+function isNewListing(item){
+  return catalogState.hasOwnProperty(item.id) && !seenCatalogIds.has(item.id);
+}
+
 const STATUS_OPTIONS = [
   ["a_voir", "À voir"], ["contacte", "Contacté"], ["visite_prevue", "Visite prévue"],
   ["visite", "Visité"], ["interessant", "Intéressant"], ["ecarte", "Écarté"]
@@ -689,10 +714,13 @@ function renderListings(){
   const sorted = visible.slice().sort((a, b) => {
     const ta = getTrack(a.id), tb = getTrack(b.id);
     if (ta.saved !== tb.saved) return ta.saved ? -1 : 1;
+    const na = isNewListing(a), nb = isNewListing(b);
+    if (na !== nb) return na ? -1 : 1;
     const ra = VERDICT_RANK[a.verdict], rb = VERDICT_RANK[b.verdict];
     if (ra !== rb) return ra - rb;
     return rentSortValue(a) - rentSortValue(b);
   });
+  scheduleMarkSeen();
 
   if (sorted.length === 0){
     const empty = document.createElement("p");
@@ -727,10 +755,22 @@ function renderListings(){
     source.className = "listing-source"; source.textContent = item.source;
     titleWrap.append(title, source);
     top.appendChild(titleWrap);
+    const badgeGroup = document.createElement("div");
+    badgeGroup.style.display = "flex";
+    badgeGroup.style.flexDirection = "column";
+    badgeGroup.style.gap = "6px";
+    badgeGroup.style.alignItems = "flex-end";
+    if (isNewListing(item)){
+      const newBadge = document.createElement("span");
+      newBadge.className = "badge badge-new";
+      newBadge.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.2 6.8H21l-5.6 4.1 2.1 6.9L12 15.8 6.5 19.8l2.1-6.9L3 8.8h6.8z"></path></svg>Nouveau';
+      badgeGroup.appendChild(newBadge);
+    }
     const badge = document.createElement("span");
     badge.className = "badge badge-" + item.verdict;
     badge.textContent = VERDICT_LABEL[item.verdict];
-    top.appendChild(badge);
+    badgeGroup.appendChild(badge);
+    top.appendChild(badgeGroup);
     card.appendChild(top);
 
     const meta = document.createElement("div");
