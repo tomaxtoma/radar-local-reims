@@ -350,7 +350,7 @@
   </div>
 
   <footer id="footer-note">
-    Site privé — demandez à Claude une actualisation des annonces quand vous en voulez de nouvelles.
+    Site privé. Un agent automatique actualise les annonces plusieurs fois par jour (9h, 12h, 16h, 19h) — statut, favoris et notes sont partagés entre vous deux en temps réel.
   </footer>
 
 </div>
@@ -374,12 +374,12 @@ import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.g
         }
    ====================================================================== */
 const firebaseConfig = {
-  apiKey: "REMPLACE_MOI",
-  authDomain: "REMPLACE_MOI.firebaseapp.com",
-  projectId: "REMPLACE_MOI",
-  storageBucket: "REMPLACE_MOI.appspot.com",
-  messagingSenderId: "REMPLACE_MOI",
-  appId: "REMPLACE_MOI"
+  apiKey: "AIzaSyBN0KixgdY-k34YoFBbHNz3SN7BEkk_3Qc",
+  authDomain: "localreims.firebaseapp.com",
+  projectId: "localreims",
+  storageBucket: "localreims.firebasestorage.app",
+  messagingSenderId: "1047994460269",
+  appId: "1:1047994460269:web:1696c46c21278a2f0b7764"
 };
 
 let db = null;
@@ -510,9 +510,22 @@ const LISTINGS_RAW = [
     note:"Bonne taille et centre-ville confirmé, mais présenté en cession (reprise de bail probable) plutôt qu'en location classique — à clarifier avec l'agence, ainsi que le prix." }
 ];
 
-const LISTINGS = LISTINGS_RAW.filter(item =>
-  !BANNED_PHRASE.test(item.title + " " + item.note + " " + (item.address || ""))
-);
+/* Annonces = les LISTINGS_RAW ci-dessus (repérées manuellement), fusionnées avec
+   la collection Firestore "catalog" (annonces ajoutées par l'agent automatique
+   ou par toi/ton associée sans toucher au code). Un même id dans "catalog"
+   remplace l'entrée statique correspondante (mise à jour). */
+let catalogState = {};
+let LISTINGS = [];
+
+function recomputeListings(){
+  const merged = {};
+  LISTINGS_RAW.forEach(item => { merged[item.id] = item; });
+  Object.keys(catalogState).forEach(id => { merged[id] = Object.assign({ id }, catalogState[id]); });
+  LISTINGS = Object.values(merged).filter(item =>
+    !BANNED_PHRASE.test((item.title || "") + " " + (item.note || "") + " " + (item.address || ""))
+  );
+}
+recomputeListings();
 
 const STATUS_OPTIONS = [
   ["a_voir", "À voir"], ["contacte", "Contacté"], ["visite_prevue", "Visite prévue"],
@@ -860,7 +873,7 @@ function setSyncPill(mode){
 function initTrackingFallback(){
   trackState = loadLocal("radar-local-reims-track");
   setSyncPill("offline");
-  document.getElementById("footer-note").textContent = "Config Firebase manquante ou hors ligne : statut/favoris/notes sont mémorisés sur cet appareil uniquement, pas partagés avec ton associée. Complète firebaseConfig dans index.html pour activer le partage.";
+  document.getElementById("footer-note").textContent = "Config Firebase manquante ou hors ligne : statut/favoris/notes sont mémorisés sur cet appareil uniquement, pas partagés avec ton associée.";
   renderListings();
 }
 
@@ -873,6 +886,14 @@ if (db){
       setSyncPill("online");
       renderListings();
     }, () => initTrackingFallback());
+
+    onSnapshot(collection(db, "catalog"), snap => {
+      const next = {};
+      snap.forEach(d => { next[d.id] = d.data() || {}; });
+      catalogState = next;
+      recomputeListings();
+      renderListings();
+    }, () => {});
   }catch(e){ initTrackingFallback(); }
 } else {
   initTrackingFallback();
