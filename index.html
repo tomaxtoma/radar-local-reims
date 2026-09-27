@@ -192,6 +192,15 @@
   .listing.v-a_verifier, .listing.v-stretch{ border-left-color:var(--warn); }
   .listing.v-budget_depasse{ border-left-color:var(--bad); }
 
+  .listing-photo{
+    width:calc(100% + 16px + 18px); margin:-16px -16px 0 -18px;
+    aspect-ratio: 16 / 9; object-fit:cover;
+    border-radius:12px 12px 0 0;
+    background:var(--surface-2);
+    display:block;
+  }
+  .listing-photo[hidden]{ display:none; }
+
   .listing-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
   .listing-title{ font-family:"Sora", sans-serif; font-weight:700; font-size:15px; line-height:1.3; }
   .listing-source{ font-size:11.5px; color:var(--ink-soft); margin-top:3px; }
@@ -210,6 +219,12 @@
   }
   .listing-meta span b{ font-weight:600; }
   .listing-address{ font-size:12.5px; color:var(--ink-soft); }
+  .listing-contact{
+    display:flex; flex-wrap:wrap; gap:6px 14px;
+    font-size:12.5px; color:var(--ink-soft);
+  }
+  .listing-contact a{ color:var(--brand-strong); text-decoration:none; font-weight:600; }
+  .listing-contact a:hover{ text-decoration:underline; }
   .listing-note{
     font-size:12.5px; line-height:1.55; color:var(--ink);
     background:var(--surface-2); border-radius:10px; padding:10px 12px;
@@ -387,86 +402,111 @@ const VERDICT_LABEL = {
 const VERDICT_RANK = { ideal:0, concept_ready:1, a_verifier:2, stretch:3, budget_depasse:4 };
 const BANNED_PHRASE = /restauration\s+interdite/i;
 
+const ERLON_CONTACT = { name:"Erlon Immo Pro", phone:"03 26 88 96 93", email:"contact@erlon-immopro.com" };
+const ARTHURLOYD_CONTACT = { name:"Arthur Loyd Reims", phone:"03 26 77 05 05", email:"reims@arthur-loyd.com" };
+
 const LISTINGS_RAW = [
   { id:"erlon-31438", title:"Local commercial — secteur Place d'Erlon", source:"Erlon Immo Pro",
     url:"https://www.erlon-immopro.com/offres-details/31438/", address:"Secteur Place d'Erlon, hypercentre, Reims",
-    surface:55, rent:1250, verdict:"ideal",
+    surface:55, rent:1250, verdict:"ideal", contact:ERLON_CONTACT,
+    photo:"https://www.visualqie.com/produits/images/DJ/publique-49125505-Nr-1.jpg",
     note:"Hypercentre, budget très confortable sous le plafond de 3 000€. Bon point de comparaison pour les autres offres de surface équivalente." },
   { id:"erlon-33707", title:"Local commercial — Place d'Erlon", source:"Erlon Immo Pro",
     url:"https://www.erlon-immopro.com/offres-details/33707/", address:"Place d'Erlon, Reims",
-    surface:80, rent:664, verdict:"a_verifier",
+    surface:80, rent:664, verdict:"a_verifier", contact:ERLON_CONTACT,
+    photo:"https://www.visualqie.com/produits/images/DJ/publique-58301130-Nr-1.jpg",
     note:"Place d'Erlon = un des meilleurs flux piétons de Reims, mais loyer anormalement bas pour l'emplacement : probablement un lot en étage ou en second jour, pas une vitrine rez-de-chaussée. À faire confirmer par l'agence avant de se déplacer." },
   { id:"erlon-33045", title:"Local commercial — Hyper Centre", source:"Erlon Immo Pro",
     url:"https://www.erlon-immopro.com/offres-details/33045/", address:"Hyper Centre, Reims",
-    surface:96, rent:3000, verdict:"ideal",
+    surface:96, rent:3000, verdict:"ideal", contact:ERLON_CONTACT,
+    photo:"https://www.visualqie.com/produits/images/DJ/publique-58035046-Nr-1.jpg",
     note:"Pile dans les critères : hyper centre, haut de la fourchette de surface, loyer au plafond du budget. Candidat sérieux si l'adresse précise confirme un bon flux piéton." },
   { id:"erlon-1089", title:"Local commercial — Rue de Vesle", source:"Erlon Immo Pro",
     url:"https://www.erlon-immopro.com/offres-details/1089/", address:"Rue de Vesle, Reims",
-    surface:100, rent:3000, verdict:"ideal",
+    surface:100, rent:3000, verdict:"ideal", contact:ERLON_CONTACT,
+    photo:"https://www.visualqie.com/produits/images/DJ/publique-56066424-Nr-1.jpg",
     note:"Rue de Vesle est un des axes commerçants majeurs du centre de Reims, flux piéton naturellement fort. Loyer au plafond du budget mais surface généreuse." },
   { id:"erlon-1091", title:"Local commercial — centre-ville, proche Rue de Vesle", source:"Erlon Immo Pro",
     url:"https://www.erlon-immopro.com/offres-details/1091/", address:"Proche Rue de Vesle, centre-ville, Reims",
-    surface:70, rent:1450, verdict:"ideal",
+    surface:70, rent:1450, verdict:"ideal", contact:ERLON_CONTACT,
+    photo:"https://www.visualqie.com/produits/images/DJ/publique-56070544-Nr-1.jpg",
     note:"Bon compromis surface/loyer en plein centre-ville, à deux pas de Vesle. Un des dossiers les plus équilibrés de la sélection." },
   { id:"erlon-33623", title:"Local commercial — centre-ville", source:"Erlon Immo Pro",
     url:"https://www.erlon-immopro.com/offres-details/33623/", address:"Centre-ville, Reims",
-    surface:69, rent:1200, verdict:"ideal",
+    surface:69, rent:1200, verdict:"ideal", contact:ERLON_CONTACT,
+    photo:"https://www.visualqie.com/produits/images/DJ/075549721_51_0064_1.jpg",
     note:"Surface et loyer dans le cœur de cible, centre-ville confirmé. Il manque le nom de rue exact — à demander à l'agence." },
   { id:"bl-41320709", title:"Ancien local de restauration rapide — proche gare", source:"BureauxLocaux.com",
     url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-louer--41320709", address:"Proche gare, Reims",
     surface:122, rent:2500, verdict:"concept_ready",
+    contact:{ name:"Franck Derouillat (ORPI Comptoir Champenois Pro)", phone:"06 23 82 78 85" },
+    photo:"https://imagescdn.bureauxlocaux.com/i2/wDmVfxPcX4F2KvrDLFl6qB_X1WvdhDqqwvugX4MzyOg/114/image.jpg",
     note:"Anciennement exploité en restauration rapide : cuisine déjà en place, donc pas de travaux d'installation. Légèrement hors hypercentre (secteur gare) et 2m² au-dessus de la fourchette cible, mais le gain de temps peut compenser." },
   { id:"erlon-29277", title:"Local commercial R+1 — Rue Talleyrand", source:"Erlon Immo Pro",
     url:"https://www.erlon-immopro.com/offres-details/29277/", address:"Rue Talleyrand, hyper centre, Reims",
-    surface:150, rent:1950, verdict:"stretch",
+    surface:150, rent:1950, verdict:"stretch", contact:ERLON_CONTACT,
+    photo:"https://www.visualqie.com/produits/images/DJ/publique-45491781-Nr-1.jpg",
     note:"Hyper centre et loyer très attractif au m², mais 150m² dépasse la fourchette de 120m² visée — à voir si une partie est en réserve/étage non exploitée en salle." },
   { id:"bl-40156573", title:"Cession de bail — angle Drouet d'Erlon / Rue de Vesle", source:"BureauxLocaux.com",
     url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-ceder--40156573", address:"Angle Place Drouet d'Erlon / Rue de Vesle, Reims",
-    surface:70, rent:1313, cession:166880, verdict:"budget_depasse",
+    surface:70, rent:1313, cession:166880, verdict:"budget_depasse", contact:ARTHURLOYD_CONTACT,
+    photo:"https://imagescdn.bureauxlocaux.com/i2/sgWsdROB5yZ4JD2HFKFk2CI061MNeVH2iXLzSgu2VtU/114/image.jpg",
     note:"Emplacement numéro 1 à Reims, mais droit au bail de 166 880€ : plus de 2,5x le budget de 65 000€ fixé. À garder de côté seulement en cas de négociation ou de financement revu à la hausse." },
   { id:"bl-40309419", title:"Local commercial — secteur Cathédrale", source:"BureauxLocaux.com",
     url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-louer--40309419", address:"Secteur Cathédrale, Reims",
     surface:107, rent:5000, verdict:"stretch",
+    contact:{ name:"Venteoulocation Reims" },
+    photo:"https://imagescdn.bureauxlocaux.com/i2/lyC9Yc63DeAsFwNzTQk9P4NGvl0mFnx7_Q6YT73XP8M/114/image.jpg",
     note:"Emplacement touristique fort, mais loyer à 5 000€/mois très au-dessus des 3 000€ visés — à réserver au cas où une offre « exceptionnelle » de financement le justifie." },
   { id:"erlon-33559", title:"Local commercial — Boulingrin", source:"Erlon Immo Pro",
     url:"https://www.erlon-immopro.com/offres-details/33559/", address:"Secteur Boulingrin, Reims",
-    surface:60, rent:1500, verdict:"ideal",
+    surface:60, rent:1500, verdict:"ideal", contact:ERLON_CONTACT,
+    photo:"https://www.visualqie.com/produits/images/DJ/782611507_33559_1.jpg",
     note:"Boulingrin est à la lisière de l'hypercentre, proche des halles, fort passage les jours de marché. Bon candidat secondaire si les options plein centre ne se concrétisent pas." },
   { id:"bl-42055248", title:"Local commercial — centre-ville", source:"BureauxLocaux.com",
     url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-louer--42055248", address:"Centre-ville, Reims",
-    surface:96, rent:1800, verdict:"ideal",
+    surface:96, rent:1800, verdict:"ideal", contact:ARTHURLOYD_CONTACT,
+    photo:"https://imagescdn.bureauxlocaux.com/i2/t7WvbCUZt5DeNKhv-virP6TL3uF9OSnr1-eZGw2tMjU/114/image.jpg",
     note:"Vitrine, bureau et réserve, bon état général. Disponible février 2026 — à anticiper si le calendrier colle avec le projet." },
   { id:"bl-41769770", title:"Local commercial — boutique + réserve à l'étage", source:"BureauxLocaux.com",
     url:"https://www.bureauxlocaux.com/annonce/local-commercial-a-louer--41769770", address:"Reims (secteur précis non communiqué)",
-    surface:85, rent:1500, verdict:"a_verifier",
+    surface:85, rent:1500, verdict:"a_verifier", contact:ARTHURLOYD_CONTACT,
+    photo:"https://imagescdn.bureauxlocaux.com/i2/RGIeAnM4gTExDx5VWkDpSY11Ul1qsh7VHgi2ZgqojOg/114/image.jpg",
     note:"Boutique d'environ 60m² en rez-de-chaussée avec vitrine de 6m linéaires, réserve à l'étage. L'annonce ne précise pas le quartier exact — à confirmer avant de se déplacer." },
   { id:"al-1295", title:"Local idéal restauration rapide — hyper-centre (réf. 1295)", source:"Arthur Loyd",
     url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Hyper-centre, Reims — réf. 1295 à demander à l'agence",
-    surface:141, rent:null, verdict:"concept_ready",
+    surface:141, rent:null, verdict:"concept_ready", contact:ARTHURLOYD_CONTACT,
+    photo:"https://www.arthur-loyd.com/media/cache/img_listing_xxl/media/image/20260617-214902_758247186_51_1265_10.jpeg.webp",
     note:"Présenté explicitement comme local idéal pour une activité de restauration rapide, en hyper-centre : correspond exactement au concept FAIPARLA. Dépasse la fourchette de surface (141 vs 120) et proposé en cession — loyer/prix à demander par téléphone." },
   { id:"al-1515", title:"Local équipé restauration, terrasse et cave (réf. 1515)", source:"Arthur Loyd",
     url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Reims — réf. 1515 à demander à l'agence",
-    surface:150, rent:null, verdict:"concept_ready",
+    surface:150, rent:null, verdict:"concept_ready", contact:ARTHURLOYD_CONTACT,
+    photo:"https://www.arthur-loyd.com/media/cache/img_listing_xxl/media/image/20260911-220255_384881487_51_1475_3.jpeg.webp",
     note:"Déjà équipé pour la restauration, avec terrasse (le bonus recherché) et cave. Surface au-dessus de la cible (150m²) mais concept clé en main — mérite un appel pour le prix." },
   { id:"al-1191", title:"Local en angle de rue, hyper-centre (réf. 1191)", source:"Arthur Loyd",
     url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Hyper-centre, angle de rue, Reims — réf. 1191",
-    surface:106, rent:null, verdict:"a_verifier",
+    surface:106, rent:null, verdict:"a_verifier", contact:ARTHURLOYD_CONTACT,
+    photo:"https://www.arthur-loyd.com/media/cache/img_listing_xxl/media/image/20251119-220052_410841602_51_1163_1.jpeg.webp",
     note:"Angle de rue en hyper-centre, dont 95m² de surface de vente, disponible de suite — bon signal de flux piéton double-face. Loyer non communiqué en ligne, à demander." },
   { id:"al-1275", title:"Local commercial — hyper-centre (réf. 1275)", source:"Arthur Loyd",
     url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Hyper-centre, Reims — réf. 1275",
-    surface:100, rent:null, verdict:"a_verifier",
+    surface:100, rent:null, verdict:"a_verifier", contact:ARTHURLOYD_CONTACT,
+    photo:"https://www.arthur-loyd.com/media/cache/img_listing_xxl/media/image/20251120-220029_925673200_51_1246_3.jpeg.webp",
     note:"Taille pile dans la cible, hyper-centre confirmé par l'agence. Loyer sur demande — à obtenir avant de se déplacer." },
   { id:"al-1415", title:"Local commercial — Reims Centre (réf. 1415)", source:"Arthur Loyd",
     url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Reims Centre — réf. 1415",
-    surface:85, rent:null, verdict:"a_verifier",
+    surface:85, rent:null, verdict:"a_verifier", contact:ARTHURLOYD_CONTACT,
+    photo:"https://www.arthur-loyd.com/media/cache/img_listing_xxl/media/image/20260617-214905_140633281_51_1377_1.jpeg.webp",
     note:"Bonne taille, secteur centre confirmé mais moins précis que hyper-centre. Loyer à demander." },
   { id:"al-936", title:"Local centre-ville + extérieur 54m² (réf. 936)", source:"Arthur Loyd",
     url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Centre-ville, Reims — réf. 936",
-    surface:72, rent:null, verdict:"a_verifier",
+    surface:72, rent:null, verdict:"a_verifier", contact:ARTHURLOYD_CONTACT,
+    photo:"https://www.arthur-loyd.com/media/cache/img_listing_xxl/media/image/20260106-214603_447827830_51_0909_5.jpeg.webp",
     note:"Espace extérieur de 54m² : correspond bien au bonus terrasse recherché. Présenté comme cession malgré la section location — à clarifier avec l'agence, tout comme le loyer." },
   { id:"al-1444", title:"Local commercial centre-ville, à céder (réf. 1444)", source:"Arthur Loyd",
     url:"https://www.arthur-loyd.com/locaux-commerciaux-location/grand-est/reims", address:"Centre-ville, Reims — réf. 1444",
-    surface:70, rent:null, verdict:"a_verifier",
+    surface:70, rent:null, verdict:"a_verifier", contact:ARTHURLOYD_CONTACT,
+    photo:"https://www.arthur-loyd.com/media/cache/img_listing_xxl/media/image/20260512-220029_530400456_51_1406_1.jpeg.webp",
     note:"Bonne taille et centre-ville confirmé, mais présenté en cession (reprise de bail probable) plutôt qu'en location classique — à clarifier avec l'agence, ainsi que le prix." }
 ];
 
@@ -652,6 +692,17 @@ function renderListings(){
     const card = document.createElement("div");
     card.className = "listing v-" + item.verdict;
 
+    if (item.photo){
+      const img = document.createElement("img");
+      img.className = "listing-photo";
+      img.src = item.photo;
+      img.alt = item.title;
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.addEventListener("error", () => { img.hidden = true; });
+      card.appendChild(img);
+    }
+
     const top = document.createElement("div");
     top.className = "listing-top";
     const titleWrap = document.createElement("div");
@@ -685,6 +736,29 @@ function renderListings(){
     const address = document.createElement("div");
     address.className = "listing-address"; address.textContent = item.address;
     card.appendChild(address);
+
+    if (item.contact && (item.contact.name || item.contact.phone || item.contact.email)){
+      const contactRow = document.createElement("div");
+      contactRow.className = "listing-contact";
+      if (item.contact.name){
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = item.contact.name;
+        contactRow.appendChild(nameSpan);
+      }
+      if (item.contact.phone){
+        const telLink = document.createElement("a");
+        telLink.href = "tel:" + item.contact.phone.replace(/\s+/g, "");
+        telLink.textContent = item.contact.phone;
+        contactRow.appendChild(telLink);
+      }
+      if (item.contact.email){
+        const mailLink = document.createElement("a");
+        mailLink.href = "mailto:" + item.contact.email;
+        mailLink.textContent = item.contact.email;
+        contactRow.appendChild(mailLink);
+      }
+      card.appendChild(contactRow);
+    }
 
     const note = document.createElement("div");
     note.className = "listing-note";
